@@ -77,45 +77,66 @@ $ tree -L 2
 
 ```javascript
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.8.15;
+pragma solidity >=0.8.15;  // define version of Solidity compiler to be used
 
+// import contracts from Git submodules:
+
+// minimalist, gas-optimised implementation of ERC721 standard
 import "solmate/tokens/ERC721.sol";
+
+// for string operations (e.g., `toString()` method)
 import "openzeppelin-contracts/contracts/utils/Strings.sol";
+
+// leverage OZ's access control contract
 import "openzeppelin-contracts/contracts/access/Ownable.sol";
 
+// define errors
 error MintPriceNotPaid();
 error MaxSupply();
 error NonExistentTokenURI();
 error WithdrawTransfer();
 
-contract NewNFT is ERC721, Ownable {
-
+// define NFT to inherit from ERC721
+// and control who owns the contract
+contract NFT is ERC721, Ownable {
     using Strings for uint256;
-    string public baseURI;
-    uint256 public currentTokenId;
+
+    // constants regarding payment
     uint256 public constant TOTAL_SUPPLY = 10_000;
     uint256 public constant MINT_PRICE = 0.08 ether;
 
+    // state vars to keep track of token identifiers
+    string public baseURI;
+    uint256 public currentTokenId;
+
+    // define constructor with given input args
     constructor(
         string memory _name,
         string memory _symbol,
         string memory _baseURI
     ) ERC721(_name, _symbol) {
-        baseURI = _baseURI;
+        baseURI = _baseURI; // set base URI
     }
 
+    // mint NFT (receives ETH)
     function mintTo(address recipient) public payable returns (uint256) {
+        // check that the correct amount has been paid
         if (msg.value != MINT_PRICE) {
             revert MintPriceNotPaid();
         }
+        // increment token identifier (uint256)
         uint256 newTokenId = ++currentTokenId;
+
+        // check that max supply has not been reached
         if (newTokenId > TOTAL_SUPPLY) {
             revert MaxSupply();
         }
-        _safeMint(recipient, newTokenId);
-        return newTokenId;
+
+        _safeMint(recipient, newTokenId); // leverage Solmate's function
+        return newTokenId; // return new token identifier to caller
     }
 
+    // get token URI
     function tokenURI(uint256 tokenId)
         public
         view
@@ -123,15 +144,19 @@ contract NewNFT is ERC721, Ownable {
         override
         returns (string memory)
     {
+        // check that the owner is not the zero address
         if (ownerOf(tokenId) == address(0)) {
             revert NonExistentTokenURI();
         }
+
+        // return token identifier (`tokenId`) as string
         return
             bytes(baseURI).length > 0
                 ? string(abi.encodePacked(baseURI, tokenId.toString()))
                 : "";
     }
 
+    // withdraw payments to only the owner
     function withdrawPayments(address payable payee) external onlyOwner {
         uint256 balance = address(this).balance;
         (bool transferTx, ) = payee.call{value: balance}("");
@@ -198,28 +223,38 @@ nothing to commit, working tree clean
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.15;
 
-import "forge-std/Test.sol";
-import "../src/NewNFT.sol";
+
+import "forge-std/Test.sol"; // import Test contract
+import "../src/NewNFT.sol"; // import your NFT contract
 
 contract NewNFTTest is Test {
-    using stdStorage for StdStorage;
+    using stdStorage for StdStorage; // leverage stdStorage library
 
     NewNFT private nft;
 
     // called before each test
     function setUp() public {
-        // Deploy NFT contract
+        // deploy NFT contract with given name, symbol and base URI
         nft = new NewNFT("New NFT", "NFT", "baseUri");
     }
 
+    // define tests:
+
+    // tests are automatically recognised with the `test` prefix
+    // `testFail` means that the test is expected to fail,
+    // thus will pass on failure
+
+    // expect failure if no ether is sent with the call
     function testFailNoMintPricePaid() public {
         nft.mintTo(address(1));
     }
 
+    // should pass with correct amount of ether sent
     function testMintPricePaid() public {
         nft.mintTo{value: 0.08 ether}(address(1));
     }
 
+    // expect failure on overflow (token identifiers are zero-indexed)
     function testFailMaxSupplyReached() public {
         uint256 slot = stdstore
             .target(address(nft))
@@ -231,10 +266,12 @@ contract NewNFTTest is Test {
         nft.mintTo{value: 0.08 ether}(address(1));
     }
 
+    // expect failure on trying to mint to zero address
     function testFailMintToZeroAddress() public {
         nft.mintTo{value: 0.08 ether}(address(0));
     }
 
+    // should pass on successful owner registration
     function testNewMintOwnerRegistered() public {
         nft.mintTo{value: 0.08 ether}(address(1));
         uint256 slotOfNewOwner = stdstore
@@ -251,6 +288,7 @@ contract NewNFTTest is Test {
         assertEq(address(ownerOfTokenIdOne), address(1));
     }
 
+    // should pass if balance is successfully incremented
     function testBalanceIncremented() public {
         nft.mintTo{value: 0.08 ether}(address(1));
         uint256 slotBalance = stdstore
@@ -271,6 +309,7 @@ contract NewNFTTest is Test {
         assertEq(balanceSecondMint, 2);
     }
 
+    // should on successful mint to NFT receiver
     function testSafeContractReceiver() public {
         Receiver receiver = new Receiver();
         nft.mintTo{value: 0.08 ether}(address(receiver));
@@ -284,32 +323,41 @@ contract NewNFTTest is Test {
         assertEq(balance, 1);
     }
 
+    // expect failure on minting to invalid address
     function testFailUnSafeContractReceiver() public {
         vm.etch(address(1), bytes("mock code"));
         nft.mintTo{value: 0.08 ether}(address(1));
     }
 
+    // should pass if the owner can successfully withdraw
     function testWithdrawalWorksAsOwner() public {
-        // Mint an NFT, sending eth to the contract
+        // mint an NFT, sending ETH to the contract
         Receiver receiver = new Receiver();
         address payable payee = payable(address(0x1337));
         uint256 priorPayeeBalance = payee.balance;
         nft.mintTo{value: nft.MINT_PRICE()}(address(receiver));
-        // Check that the balance of the contract is correct
+
+        // check that the balance of the contract is correct
         assertEq(address(nft).balance, nft.MINT_PRICE());
+
         uint256 nftBalance = address(nft).balance;
-        // Withdraw the balance and assert it was transferred
+
+        // withdraw the balance and confirm it was transferred
         nft.withdrawPayments(payee);
         assertEq(payee.balance, priorPayeeBalance + nftBalance);
     }
 
+    // expect failure on withdrawal from an account/contract 
+    // that is not the owner
     function testWithdrawalFailsAsNotOwner() public {
-        // Mint an NFT, sending eth to the contract
+        // mint an NFT, sending ETH to the contract
         Receiver receiver = new Receiver();
         nft.mintTo{value: nft.MINT_PRICE()}(address(receiver));
-        // Check that the balance of the contract is correct
+
+        // check that the balance of the contract is correct
         assertEq(address(nft).balance, nft.MINT_PRICE());
-        // Confirm that a non-owner cannot withdraw
+
+        // confirm that a non-owner cannot withdraw
         vm.expectRevert("Ownable: caller is not the owner");
         vm.startPrank(address(0xd3ad));
         nft.withdrawPayments(payable(address(0xd3ad)));
@@ -317,6 +365,7 @@ contract NewNFTTest is Test {
     }
 }
 
+// mock contract representing a receiving account
 contract Receiver is ERC721TokenReceiver {
     function onERC721Received(
         address operator,

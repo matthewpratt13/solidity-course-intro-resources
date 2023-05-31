@@ -77,28 +77,38 @@ $ tree -L 2
 
 ```javascript
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.15;
+pragma solidity ^0.8.15; // define version of Solidity compiler to be used
 
-// import contracts from Git submodules
-import "solmate/tokens/ERC721.sol"; // gas-optimised implementation
+// import contracts from Git submodules:
+
+
+// minimalist, gas-optimised implementation of ERC721 standard
+import "solmate/tokens/ERC721.sol";
+
+// for string operations (e.g., `toString()` method)
 import "openzeppelin-contracts/contracts/utils/Strings.sol";
 
+// create an NFT to inherit from Solmate's ERC721 implementation
 contract NewNFT is ERC721 {
+    // state var to keep track of token identifiers
     uint256 public currentTokenId;
 
-    // takes args and passes on to parent constructor
+    // instantiate contract; take input args and pass to parent constructor
     constructor(
         string memory _name,
         string memory _symbol
     ) ERC721(_name, _symbol) {}
 
-    // allows anyone to mint an NFT
+    // mint NFT (receives ETH)
     function mintTo(address recipient) public payable returns (uint256) {
+        // increment token identifier (uint256)
         uint256 newItemId = ++currentTokenId;
-        _safeMint(recipient, newItemId);
-        return newItemId;
+    
+        _safeMint(recipient, newItemId); // leverage Solmate's function
+        return newItemId; // return new token identifier to caller
     }
 
+    // return token identifier (`id`) as string
     function tokenURI(uint256 id) public view virtual override returns (string memory) {
         return Strings.toString(id);
     }

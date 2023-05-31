@@ -77,45 +77,66 @@ $ tree -L 2
 
 ```javascript
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.8.15;
+pragma solidity >=0.8.15;  // define version of Solidity compiler to be used
 
+// import contracts from Git submodules:
+
+// minimalist, gas-optimised implementation of ERC721 standard
 import "solmate/tokens/ERC721.sol";
+
+// for string operations (e.g., `toString()` method)
 import "openzeppelin-contracts/contracts/utils/Strings.sol";
+
+// leverage OZ's access control contract
 import "openzeppelin-contracts/contracts/access/Ownable.sol";
 
+// define errors
 error MintPriceNotPaid();
 error MaxSupply();
 error NonExistentTokenURI();
 error WithdrawTransfer();
 
+// define NFT to inherit from ERC721
+// and control who owns the contract
 contract NFT is ERC721, Ownable {
-
     using Strings for uint256;
-    string public baseURI;
-    uint256 public currentTokenId;
+
+    // constants regarding payment
     uint256 public constant TOTAL_SUPPLY = 10_000;
     uint256 public constant MINT_PRICE = 0.08 ether;
 
+    // state vars to keep track of token identifiers
+    string public baseURI;
+    uint256 public currentTokenId;
+
+    // define constructor with given input args
     constructor(
         string memory _name,
         string memory _symbol,
         string memory _baseURI
     ) ERC721(_name, _symbol) {
-        baseURI = _baseURI;
+        baseURI = _baseURI; // set base URI
     }
 
+    // mint NFT (receives ETH)
     function mintTo(address recipient) public payable returns (uint256) {
+        // check that the correct amount has been paid
         if (msg.value != MINT_PRICE) {
             revert MintPriceNotPaid();
         }
+        // increment token identifier (uint256)
         uint256 newTokenId = ++currentTokenId;
+
+        // check that max supply has not been reached
         if (newTokenId > TOTAL_SUPPLY) {
             revert MaxSupply();
         }
-        _safeMint(recipient, newTokenId);
-        return newTokenId;
+
+        _safeMint(recipient, newTokenId); // leverage Solmate's function
+        return newTokenId; // return new token identifier to caller
     }
 
+    // get token URI
     function tokenURI(uint256 tokenId)
         public
         view
@@ -123,15 +144,19 @@ contract NFT is ERC721, Ownable {
         override
         returns (string memory)
     {
+        // check that the owner is not the zero address
         if (ownerOf(tokenId) == address(0)) {
             revert NonExistentTokenURI();
         }
+
+        // return token identifier (`tokenId`) as string
         return
             bytes(baseURI).length > 0
                 ? string(abi.encodePacked(baseURI, tokenId.toString()))
                 : "";
     }
 
+    // withdraw payments to only the owner
     function withdrawPayments(address payable payee) external onlyOwner {
         uint256 balance = address(this).balance;
         (bool transferTx, ) = payee.call{value: balance}("");
