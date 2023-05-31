@@ -5,6 +5,12 @@
 > -   Text editor or IDE such as [Visual Studio Code](https://code.visualstudio.com/Download)
 > -   [Git](https://git-scm.com/downloads) version control
 
+Using Solidity to write contract deployment scripts is more intuitive and expansive than only using `forge create`.
+
+Solidity scripts in Foundry are like TypeScript code with Hardhat. Foundry's fast EVM back end allows us to use Solidity to perform dry runs.
+
+Here's how to get started:
+
 ## Install Foundry (from Terminal)
 
 -   download `foundryup`:
