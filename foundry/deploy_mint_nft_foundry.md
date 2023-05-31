@@ -96,6 +96,8 @@ import "openzeppelin-contracts/contracts/utils/Strings.sol";
 
 // create an NFT to inherit from Solmate's ERC721 implementation
 contract NewNFT is ERC721 {
+    using Strings for uint256;
+    
     // state var to keep track of token identifiers
     uint256 public currentTokenId;
 
