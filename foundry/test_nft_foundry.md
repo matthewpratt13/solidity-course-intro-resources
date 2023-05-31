@@ -5,7 +5,13 @@
 > -   Text editor or IDE such as [Visual Studio Code](https://code.visualstudio.com/Download)
 > -   [Git](https://git-scm.com/downloads) version control
 
-## Install Foundry (from Terminal)
+Unlike TypeScript in Hardhat, with Foundry, Solidity is used to write tests.
+
+Using Solidity is a more practical and seamless approach to writing tests for smart contracts written in the same language. Foundry provides a vast toolkit for testing with Forge, which offers cheatcodes and advanced features that other test suites do not.
+
+Here's a breakdown of how to test a novel ERC721 NFT smart contract with Solidity and Foundry:
+
+## Install Foundry (from the command line)
 
 -   download `foundryup`:
 
@@ -13,7 +19,7 @@
 $ curl -L https://foundry.paradigm.xyz | bash
 ```
 
--   install foundry:
+-   install Foundry:
 
 ```bash
 $ foundryup

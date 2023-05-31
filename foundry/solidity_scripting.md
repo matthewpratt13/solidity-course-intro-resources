@@ -7,11 +7,12 @@
 
 Using Solidity to write contract deployment scripts is more intuitive and expansive than only using `forge create`.
 
-Solidity scripts in Foundry are like TypeScript code with Hardhat. Foundry's fast EVM back end allows us to use Solidity to perform dry runs.
+Solidity scripts in Foundry are like TypeScript code with Hardhat.
+Foundry's fast EVM back end allows us to use Solidity to perform dry runs.
 
 Here's how to get started:
 
-## Install Foundry (from Terminal)
+## Install Foundry (from the command line)
 
 -   download `foundryup`:
 
@@ -19,7 +20,7 @@ Here's how to get started:
 $ curl -L https://foundry.paradigm.xyz | bash
 ```
 
--   install foundry:
+-   install Foundry:
 
 ```bash
 $ foundryup

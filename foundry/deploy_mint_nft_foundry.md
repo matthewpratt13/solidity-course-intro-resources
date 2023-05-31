@@ -5,7 +5,14 @@
 > -   Text editor or IDE such as [Visual Studio Code](https://code.visualstudio.com/Download)
 > -   [Git](https://git-scm.com/downloads) version control
 
-## Install Foundry (from Terminal)
+Foundry is a complete development toolchain, written in Rust.
+
+Developers can leverage Solidity and Foundry as an alternative to other tools, such as TypeScript and Hardhat, when dealing with smart contracts written in Solidity.
+Foundry manages dependencies, runs tests, compiles and deploys contracts and lets you interact with the EVM from the command line.
+
+Here's an example of how to deploy and mint a novel ERC721 NFT smart contract using Foundry and Solidity:
+
+## Install Foundry (from the command line)
 
 -   download `foundryup`:
 
@@ -13,7 +20,7 @@
 $ curl -L https://foundry.paradigm.xyz | bash
 ```
 
--   install foundry:
+-   install Foundry:
 
 ```bash
 $ foundryup
