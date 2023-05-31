@@ -44,12 +44,12 @@ $ code .
 
 ### Terminal
 
--   install contract implementations and dependencies from [OpenZeppelin](https://github.com/OpenZeppelin/openzeppelin-contracts) and [Solmate](https://github.com/Rari-Capital/solmate), which will be installated as Git submodules in the `lib` directory:
+- install contract implementations and dependencies from [OpenZeppelin](https://github.com/OpenZeppelin/openzeppelin-contracts) and [Solmate](https://github.com/transmissions11/solmate), which will be installed as Git submodules in the `lib` directory:
 
 ```bash
-$ forge install Rari-Capital/solmate Openzeppelin/openzeppelin-contracts
+$ forge install transmissions11/solmate Openzeppelin/openzeppelin-contracts
 
-Installing solmate in "<path-to-project>/nft_tutorial_foundry/lib/solmate" (url: Some("https://github.com/Rari-Capital/solmate"), tag: None)
+Installing solmate in "<path-to-project>/nft_tutorial_foundry/lib/solmate" (url: Some("https://github.com/transmissions11/solmate"), tag: None)
     Installed solmate
 Installing openzeppelin-contracts in "<path-to-project>/nft_tutorial_foundry/lib/openzeppelin-contracts" (url: Some("https://github.com/Openzeppelin/openzeppelin-contracts"), tag: None)
     Installed openzeppelin-contracts
