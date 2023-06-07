@@ -271,7 +271,7 @@ $ source .env
 -   deploy the contract to the Goerli testnet:
 
 ```bash
-$ forge script script/NFT.s.sol:MyScript --rpc-url $GOERLI_RPC_URL  --private-key $PRIVATE_KEY --broadcast --verify --etherscan-api-key $ETHERSCAN_API_KEY -vvvv
+$ forge create src/script/NFT.s.sol:MyScript --rpc-url $GOERLI_RPC_URL  --private-key $PRIVATE_KEY  --etherscan-api-key $ETHERSCAN_API_KEY --verify -vvvv
 [⠒] Compiling...
 [⠒] Compiling 1 files with 0.8.15
 [⠑] Solc 0.8.15 finished in 978.98ms
@@ -417,7 +417,7 @@ Listening on 127.0.0.1:8545
 -   then run the following code with one of the private keys given to you by Anvil in a new Terminal:
 
 ```bash
-$ forge script script/NFT.s.sol:MyScript --fork-url http://localhost:8545 --private-key $PRIVATE_KEY0 --broadcast
+$ forge create script/NFT.s.sol:MyScript --fork-url http://localhost:8545 --private-key $PRIVATE_KEY0 --broadcast
 
 [⠰] Compiling...
 Nothing to compile
