@@ -1,13 +1,13 @@
 # Scripting with Solidity
 
-> ## ✅ Pre-requisites
+> ## ✅ Prerequisites
 >
 > -   Text editor or IDE such as [Visual Studio Code](https://code.visualstudio.com/Download)
 > -   [Git](https://git-scm.com/downloads) version control
 
 Using Solidity to write contract deployment scripts is more intuitive and expansive than only using `forge create`.
 
-Solidity scripts in Foundry are like TypeScript code with Hardhat.
+Solidity scripts in Foundry are like TypeScript code in Hardhat.
 Foundry's fast EVM back end allows us to use Solidity to perform dry runs.
 
 Here's how to get started:
@@ -45,11 +45,13 @@ $ code .
 
 ### Terminal
 
--   install contract implementations and dependencies from [OpenZeppelin](https://github.com/OpenZeppelin/openzeppelin-contracts) and [Solmate](https://github.com/transmissions11/solmate), which will be installed as Git submodules in the `lib` directory:
+- install contract implementations and dependencies from [OpenZeppelin](https://github.com/OpenZeppelin/openzeppelin-contracts) and [Solmate](https://github.com/transmissions11/solmate), which will be installed as Git submodules in the `lib` directory:
 
 ```bash
 $ forge install transmissions11/solmate Openzeppelin/openzeppelin-contracts
-
+```
+output:
+```bash
 Installing solmate in "<path-to-project>/nft_tutorial_foundry/lib/solmate" (url: Some("https://github.com/transmissions11/solmate"), tag: None)
     Installed solmate
 Installing openzeppelin-contracts in "<path-to-project>/nft_tutorial_foundry/lib/openzeppelin-contracts" (url: Some("https://github.com/Openzeppelin/openzeppelin-contracts"), tag: None)
@@ -60,6 +62,9 @@ Installing openzeppelin-contracts in "<path-to-project>/nft_tutorial_foundry/lib
 
 ```bash
 $ tree -L 2
+```
+output:
+```bash
 .
 ├── foundry.toml
 ├── lib
@@ -84,11 +89,11 @@ $ tree -L 2
 
 ```javascript
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.8.15;  // define version of Solidity compiler to be used
+pragma solidity ^0.8.15;  // define version of Solidity compiler to be used
 
 // import contracts from Git submodules:
 
-// minimalist, gas-optimised implementation of ERC721 standard
+// minimalist, gas-optimised implementation of ERC-721 standard
 import "solmate/tokens/ERC721.sol";
 
 // for string operations (e.g., `toString()` method)
@@ -103,7 +108,7 @@ error MaxSupply();
 error NonExistentTokenURI();
 error WithdrawTransfer();
 
-// define NFT to inherit from ERC721
+// define NFT to inherit from ERC-721
 // and control who owns the contract
 contract NFT is ERC721, Ownable {
     using Strings for uint256;
@@ -172,7 +177,6 @@ contract NFT is ERC721, Ownable {
         }
     }
 }
-
 ```
 
 ### Terminal
@@ -181,13 +185,16 @@ contract NFT is ERC721, Ownable {
 
 ```bash
 $ forge build
+```
+output:
+```bash
 [⠢] Compiling...
 [⠑] Compiling 13 files with 0.8.15
 [⠃] Solc 0.8.15 finished in 3.45s
 Compiler run successful
 ```
 
-## Commit changes to Git (from Terminal)
+## Commit changes to Git (from the command line)
 
 ### Terminal
 
@@ -196,18 +203,24 @@ Compiler run successful
 ```bash
 $ git add .
 $ git status
+```
+output:
+
+```bash
 On branch main
 Changes to be committed:
   (use "git restore --staged <file>..." to unstage)
         deleted:    src/Contract.sol
         new file:   src/NFT.sol
-
 ```
 
 -   commit the changes with a message:
 
 ```bash
 $ git commit -m "initial commit"
+```
+output:
+```bash
 [main 2ab9778] initial commit
  2 files changed, 63 insertions(+), 4 deletions(-)
  delete mode 100644 src/Contract.sol
@@ -218,6 +231,9 @@ $ git commit -m "initial commit"
 
 ```bash
 $ git status
+```
+output:
+```bash
 On branch main
 nothing to commit, working tree clean
 ```
@@ -229,14 +245,14 @@ nothing to commit, working tree clean
 ### .env
 
 ```bash
-GOERLI_RPC_URL="<alchemy-api-url>"
+RPC_URL="<alchemy-api-url>"
 PRIVATE_KEY=<your-private-key>
 ETHERSCAN_API_KEY="<etherscan-api-key>"
 ```
 
--   add a new `NFT.s.sol` file in the `scripts` directory and add the following code:
+-   add a new `NFT.s.sol` file in the `script` directory and add the following code:
 
-### scripts/NFT.s.sol
+### script/NFT.s.sol
 
 ```javascript
 // SPDX-License-Identifier: UNLICENSED
@@ -259,10 +275,9 @@ contract MyScript is Script {
         vm.stopBroadcast();
     }
 }
-
 ```
 
--   load the environment variables rom the root directory:
+-   load the environment variables from the root directory:
 
 ```bash
 $ source .env
@@ -271,66 +286,20 @@ $ source .env
 -   deploy the contract to the Goerli testnet:
 
 ```bash
-$ forge create src/script/NFT.s.sol:MyScript --rpc-url $GOERLI_RPC_URL  --private-key $PRIVATE_KEY  --etherscan-api-key $ETHERSCAN_API_KEY --verify -vvvv
+$ forge create script/NFT.s.sol:MyScript --rpc-url $RPC_URL --private-key $PRIVATE_KEY --etherscan-api-key $ETHERSCAN_API_KEY --verify
+```
+output:
+```bash
 [⠒] Compiling...
 [⠒] Compiling 1 files with 0.8.15
 [⠑] Solc 0.8.15 finished in 978.98ms
 Compiler run successful
+Deployer: <your-public-key>
+Deployed to: <contract-address>
+Transaction hash: <txn-hash>
+Starting contract verification...
+Waiting for etherscan to detect contract deployment...
 
-Traces:
-  [1211432] MyScript::run()
-    ├─ [0] VM::startBroadcast()
-    │   └─ ← ()
-    ├─ [1174482] → new NFT@<contract-address>
-    │   ├─ emit OwnershipTransferred(previousOwner: 0x0000000000000000000000000000000000000000, newOwner: <your-public-key>)
-    │   └─ ← 5402 bytes of code
-    ├─ [0] VM::stopBroadcast()
-    │   └─ ← ()
-    └─ ← ()
-
-
-Script ran successfully.
-==========================
-Simulated On-chain Traces:
-
-  [1327530] → new NFT@<contract-address>
-    ├─ emit OwnershipTransferred(previousOwner: 0x0000000000000000000000000000000000000000, newOwner: <your-public-key>)
-    └─ ← 5402 bytes of code
-
-
-==========================
-
-Estimated total gas used for script: 1725789
-
-Estimated amount required: 0.005177367024161046 ETH
-
-==========================
-
-###
-Finding wallets for all the necessary addresses...
-##
-Sending transactions [0 - 0].
-⠁ [00:00:00] [#################################################################################################################################################################################] 1/1 txes (0.0s)
-Transactions saved to: broadcast/NFT.s.sol/5/run-latest.json
-
-##
-Waiting for receipts.
-⠉ [00:00:14] [#############################################################################################################################################################################] 1/1 receipts (0.0s)
-#####
-✅ Hash: <txn-hash>
-Contract Address: <contract-address>
-Block: <block-num>
-Paid: 0.00398259000929271 ETH (1327530 gas * 3.000000007 gwei)
-
-
-Transactions saved to: broadcast/NFT.s.sol/5/run-latest.json
-
-
-
-==========================
-
-ONCHAIN EXECUTION COMPLETE & SUCCESSFUL. Transaction receipts written to "broadcast/NFT.s.sol/5/run-latest.json"
-##
 Start Contract Verification
 
 Submitting verification for [src/NFT.sol:NFT] <contract-address>.
@@ -346,15 +315,15 @@ Submitted contract for verification:
         URL: https://goerli.etherscan.io/address/<contract-address>
 Waiting for verification result...
 Contract successfully verified.
-
-Transactions saved to: broadcast/NFT.s.sol/5/run-latest.json
-
 ```
 
 -   to deploy locally, first start Anvil:
 
 ```bash
 $ anvil
+```
+output:
+```bash
 
 
                              _   _
@@ -418,7 +387,9 @@ Listening on 127.0.0.1:8545
 
 ```bash
 $ forge create script/NFT.s.sol:MyScript --fork-url http://localhost:8545 --private-key $PRIVATE_KEY0 --broadcast
-
+```
+output:
+```bash
 [⠰] Compiling...
 Nothing to compile
 Script ran successfully.
@@ -457,16 +428,18 @@ Transactions saved to: broadcast/NFT.s.sol/31337/run-latest.json
 ONCHAIN EXECUTION COMPLETE & SUCCESSFUL. Transaction receipts written to "broadcast/NFT.s.sol/31337/run-latest.json"
 
 Transactions saved to: broadcast/NFT.s.sol/31337/run-latest.json
-
 ```
 
-## Commit changes to Git (from Terminal)
+## Commit changes to Git (from the command line)
 
 -   stage the changes:
 
 ```bash
 $ git add .
 $ git status
+```
+output:
+```bash
 On branch main
 Changes to be committed:
   (use "git restore --staged <file>..." to unstage)
@@ -476,13 +449,15 @@ Changes to be committed:
         new file:   broadcast/NFT.s.sol/5/run-1656418639.json
         new file:   broadcast/NFT.s.sol/5/run-latest.json
         new file:   script/NFT.s.sol
-
 ```
 
 -   commit the changes with a message:
 
 ```bash
 $ git commit -m "add script"
+```
+output:
+```bash
 [main a64925b] add script
  6 files changed, 27 insertions(+)
  create mode 100644 .env
@@ -497,6 +472,11 @@ $ git commit -m "add script"
 
 ```bash
 $ git status
+```
+output:
+```bash
 On branch main
 nothing to commit, working tree clean
 ```
+
+And that's it! Congratulations on deploying your first ERC-721 NFT using Solidity scripts in Foundry.

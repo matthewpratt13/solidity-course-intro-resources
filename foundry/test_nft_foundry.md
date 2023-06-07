@@ -1,15 +1,15 @@
 # Testing an NFT with Solidity and Foundry
 
-> ## ✅ Pre-requisites
+> ## ✅ Prerequisites
 >
 > -   Text editor or IDE such as [Visual Studio Code](https://code.visualstudio.com/Download)
 > -   [Git](https://git-scm.com/downloads) version control
 
-Unlike TypeScript in Hardhat, with Foundry, Solidity is used to write tests.
+Unlike TypeScript in Hardhat, Solidity is used to write tests in Foundry.
 
 Using Solidity is a more practical and seamless approach to writing tests for smart contracts written in the same language. Foundry provides a vast toolkit for testing with Forge, which offers cheatcodes and advanced features that other test suites do not.
 
-Here's a breakdown of how to test a novel ERC721 NFT smart contract with Solidity and Foundry:
+Here's a breakdown of how to test a novel ERC-721 NFT smart contract with Solidity and Foundry:
 
 ## Install Foundry (from the command line)
 
@@ -48,7 +48,9 @@ $ code .
 
 ```bash
 $ forge install transmissions11/solmate Openzeppelin/openzeppelin-contracts
-
+```
+output:
+```bash
 Installing solmate in "<path-to-project>/nft_tutorial_foundry/lib/solmate" (url: Some("https://github.com/transmissions11/solmate"), tag: None)
     Installed solmate
 Installing openzeppelin-contracts in "<path-to-project>/nft_tutorial_foundry/lib/openzeppelin-contracts" (url: Some("https://github.com/Openzeppelin/openzeppelin-contracts"), tag: None)
@@ -59,6 +61,9 @@ Installing openzeppelin-contracts in "<path-to-project>/nft_tutorial_foundry/lib
 
 ```bash
 $ tree -L 2
+```
+output:
+```bash
 .
 ├── foundry.toml
 ├── lib
@@ -83,11 +88,11 @@ $ tree -L 2
 
 ```javascript
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.8.15;  // define version of Solidity compiler to be used
+pragma solidity ^0.8.15;  // define version of Solidity compiler to be used
 
 // import contracts from Git submodules:
 
-// minimalist, gas-optimised implementation of ERC721 standard
+// minimalist, gas-optimised implementation of ERC-721 standard
 import "solmate/tokens/ERC721.sol";
 
 // for string operations (e.g., `toString()` method)
@@ -102,7 +107,7 @@ error MaxSupply();
 error NonExistentTokenURI();
 error WithdrawTransfer();
 
-// define NFT to inherit from ERC721
+// define NFT to inherit from ERC-721
 // and control who owns the contract
 contract NFT is ERC721, Ownable {
     using Strings for uint256;
@@ -171,7 +176,6 @@ contract NFT is ERC721, Ownable {
         }
     }
 }
-
 ```
 
 ### Terminal
@@ -180,31 +184,39 @@ contract NFT is ERC721, Ownable {
 
 ```bash
 $ forge build
+```
+output:
+```bash
 [⠢] Compiling...
 [⠔] Compiling 13 files with 0.8.15
 [⠘] Solc 0.8.15 finished in 3.26s
 Compiler run successful
 ```
 
-## Commit changes to Git (from Terminal)
+## Commit changes to Git (from the command line)
 
 -   stage the changes:
 
 ```bash
 $ git add .
 $ git status
+````
+output:
+```bash
 On branch main
 Changes to be committed:
   (use "git restore --staged <file>..." to unstage)
         deleted:    Contract.sol
         new file:   NewNFT.sol
-
 ```
 
 -   commit the changes with a message:
 
 ```bash
 $ git commit -m "initial commit"
+```
+output:
+```bash
 [main 80e6eae] initial commit
  2 files changed, 64 insertions(+), 4 deletions(-)
  delete mode 100644 src/Contract.sol
@@ -215,20 +227,22 @@ $ git commit -m "initial commit"
 
 ```bash
 $ git status
+```
+ouput:
+```bash
 On branch main
 nothing to commit, working tree clean
 ```
 
 ## Testing
 
--   rename the `Contract.t.sol` in the `tests` directory to `NewNFT.t.sol`
+-   rename the `Contract.t.sol` in the `test` directory to `NewNFT.t.sol`
 
 -   add this code:
 
 ```javascript
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.15;
-
 
 import "forge-std/Test.sol"; // import Test contract
 import "../src/NewNFT.sol"; // import your NFT contract
@@ -384,10 +398,13 @@ contract Receiver is ERC721TokenReceiver {
 }
 ```
 
--   run the tests with gas reports:
+-   run the tests with gas report:
 
 ```bash
 $ forge test --gas-report
+```
+output:
+```bash
 [⠔] Compiling...
 [⠆] Compiling 1 files with 0.8.15
 [⠔] Solc 0.8.15 finished in 1.76s
@@ -446,18 +463,23 @@ Test result: ok. 10 passed; 0 failed; finished in 2.32ms
 ```bash
 $ git add .
 $ git status
+```
+output:
+```bash
 On branch main
 Changes to be committed:
   (use "git restore --staged <file>..." to unstage)
         deleted:    test/Contract.t.sol
         new file:   test/NewNFT.t.sol
-
 ```
 
 -   commit the changes with a message:
 
 ```bash
 $ git commit -m "add tests"
+```
+output:
+```bash
 [main ea69376] add tests
  2 files changed, 132 insertions(+), 12 deletions(-)
  delete mode 100644 test/Contract.t.sol
@@ -468,6 +490,10 @@ $ git commit -m "add tests"
 
 ```bash
 $ git status
+```
+output:
+```bash
 On branch main
 nothing to commit, working tree clean
 ```
+And that's it! Congratulations on testing your first ERC-721 NFT using Solidity in Foundry.

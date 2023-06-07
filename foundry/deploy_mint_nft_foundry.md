@@ -1,6 +1,6 @@
 # Deploying and minting an NFT with Solidity and Foundry
 
-> ## ✅ Pre-requisites
+> ## ✅ Prerequisites
 >
 > -   Text editor or IDE such as [Visual Studio Code](https://code.visualstudio.com/Download)
 > -   [Git](https://git-scm.com/downloads) version control
@@ -10,7 +10,7 @@ Foundry is a complete development toolchain, written in Rust.
 Developers can leverage Solidity and Foundry as an alternative to other tools, such as TypeScript and Hardhat, when dealing with smart contracts written in Solidity.
 Foundry manages dependencies, runs tests, compiles and deploys contracts and lets you interact with the EVM from the command line.
 
-Here's an example of how to deploy and mint a novel ERC721 NFT smart contract using Foundry and Solidity:
+Here's an example of how to deploy and mint a novel ERC-721 NFT smart contract using Foundry and Solidity:
 
 ## Install Foundry (from the command line)
 
@@ -45,11 +45,13 @@ $ code .
 
 ### Terminal
 
-- install contract implementations and dependencies from [OpenZeppelin](https://github.com/OpenZeppelin/openzeppelin-contracts) and [Solmate](https://github.com/transmissions11/solmate), which will be installed as Git submodules in the `lib` directory:
+-   install contract implementations and dependencies from [OpenZeppelin](https://github.com/OpenZeppelin/openzeppelin-contracts) and [Solmate](https://github.com/transmissions11/solmate), which will be installed as Git submodules in the `lib` directory:
 
 ```bash
 $ forge install transmissions11/solmate Openzeppelin/openzeppelin-contracts
-
+```
+output:
+```bash
 Installing solmate in "<path-to-project>/nft_tutorial_foundry/lib/solmate" (url: Some("https://github.com/transmissions11/solmate"), tag: None)
     Installed solmate
 Installing openzeppelin-contracts in "<path-to-project>/nft_tutorial_foundry/lib/openzeppelin-contracts" (url: Some("https://github.com/Openzeppelin/openzeppelin-contracts"), tag: None)
@@ -60,6 +62,9 @@ Installing openzeppelin-contracts in "<path-to-project>/nft_tutorial_foundry/lib
 
 ```bash
 $ tree -L 2
+```
+output:
+```bash
 .
 ├── foundry.toml
 ├── lib
@@ -88,13 +93,13 @@ pragma solidity ^0.8.15; // define version of Solidity compiler to be used
 
 // import contracts from Git submodules:
 
-// minimalist, gas-optimised implementation of ERC721 standard
+// minimalist, gas-optimised implementation of ERC-721 standard
 import "solmate/tokens/ERC721.sol";
 
 // for string operations (e.g., `toString()` method)
 import "openzeppelin-contracts/contracts/utils/Strings.sol";
 
-// create an NFT to inherit from Solmate's ERC721 implementation
+// create an NFT to inherit from Solmate's ERC-721 implementation
 contract NewNFT is ERC721 {
     using Strings for uint256;
     
@@ -112,7 +117,7 @@ contract NewNFT is ERC721 {
         // increment token identifier (uint256)
         uint256 newItemId = ++currentTokenId;
     
-        _safeMint(recipient, newItemId); // leverage Solmate's function
+        _safeMint(recipient, newItemId); // (Solmate's function)
         return newItemId; // return new token identifier to caller
     }
 
@@ -129,13 +134,16 @@ contract NewNFT is ERC721 {
 
 ```bash
 $ forge build
+```
+output:
+```bash
 [⠢] Compiling...
 [⠆] Compiling 11 files with 0.8.15
 [⠒] Solc 0.8.15 finished in 3.14s
 Compiler run successful
 ```
 
-## Commit changes to Git (from Terminal)
+## Commit changes to Git (from the command line)
 
 ### Terminal
 
@@ -144,6 +152,9 @@ Compiler run successful
 ```bash
 $ git add .
 $ git status
+```
+output:
+```bash
 On branch main
 Changes to be committed:
   (use "git restore --staged <file>..." to unstage)
@@ -155,6 +166,9 @@ Changes to be committed:
 
 ```bash
 $ git commit -m "initial commit"
+```
+output:
+```bash
 [main fe48e62] initial commit
  2 files changed, 32 insertions(+), 4 deletions(-)
  delete mode 100644 src/Contract.sol
@@ -165,24 +179,32 @@ $ git commit -m "initial commit"
 
 ```bash
 $ git status
+```
+output:
+```bash
 On branch main
 nothing to commit, working tree clean
 ```
 
 ## Deployment
 
--   set up your environment variables (from Terminal):
+-  create a new `.env` file in the root directory to store your environment variables and add them:
+
+### .env
 
 ```bash
-export RPC_URL="<alchemy-api-url>"
-export PRIVATE_KEY=<your-private-key>
-export ETHERSCAN_API_KEY="<etherscan-api-key>"
+RPC_URL="<alchemy-api-url>"
+PRIVATE_KEY=<your-private-key>
+ETHERSCAN_API_KEY="<etherscan-api-key>"
 ```
 
 -   deploy the contract and verify it on Etherscan (the network is determined by the API URL):
 
 ```bash
-$ forge create NewNFT --rpc-url=$RPC_URL --private-key=$PRIVATE_KEY --constructor-args "New NFT" "NFT" --verify
+$ forge create NewNFT --constructor-args "New NFT" "NFT" --rpc-url=$RPC_URL --private-key=$PRIVATE_KEY --etherscan-api-key $ETHERSCAN_API_KEY --verify
+```
+output:
+```bash
 [⠔] Compiling...
 No files changed, compilation skipped
 Deployer: <your-public-key>
@@ -211,8 +233,10 @@ Contract successfully verified.
 -   use Cast to mint the NFT to a given address (take the contract address from the Terminal output of the `forge create` command above):
 
 ```bash
-$ cast send --rpc-url=$RPC_URL <contract-address>  "mintTo(address)" <receiver-address> --private-key=$PRIVATE_KEY
-
+$ cast send --rpc-url=$RPC_URL <contract-address> "mintTo(address)" <receiver-address> --private-key=$PRIVATE_KEY
+```
+output:
+```
 blockHash              <block-hash>
 blockNumber            <block-number>
 contractAddress
@@ -260,5 +284,10 @@ type                    2
 
 ```bash
 $ cast call --rpc-url=$RPC_URL --private-key=$PRIVATE_KEY <contract-address> "ownerOf(uint256)" 1
+```
+output:
+```bash
 0x000000000000000000000000<receiver-address>
 ```
+
+And that's it! Congratulations on deploying and minting your first ERC-721 NFT using Foundry.
